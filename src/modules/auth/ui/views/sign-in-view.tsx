@@ -2,7 +2,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import {z} from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
-import {OctagonAlertIcon} from 'lucide-react'
+import {GithubIcon, OctagonAlertIcon} from 'lucide-react'
 
 import {
   Form,
@@ -19,8 +19,8 @@ import Image from 'next/image'
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { authClient } from '@/lib/auth-client'
+import { useRouter } from 'next/navigation'
 
 const formSchema=z.object({
     email:z.string().email("Invalid Email address"),
@@ -28,9 +28,9 @@ const formSchema=z.object({
 });
 
 const SignInView = () => {
-    const router=useRouter()
     const [error, seterror] = useState<string|null>(null)
     const [loading, setloading] = useState(false)
+    const router=useRouter()
 
     const form=useForm<z.infer<typeof formSchema>>({
         resolver:zodResolver(formSchema),
@@ -45,11 +45,29 @@ const SignInView = () => {
         setloading(true)
         await authClient.signIn.email({
             email:data.email,
-            password:data.password
+            password:data.password,
+            callbackURL:'/'
         },{
             onSuccess:()=>{
                 setloading(false)
                 router.push('/')
+            },
+            onError:({error})=>{
+                seterror(error.message)
+            }
+        }
+    )
+
+    }
+    const onSocial=async (provider:"google"|"github")=>{
+        seterror(null)
+        setloading(true)
+        await authClient.signIn.social({
+            provider:provider,
+            callbackURL:'/'
+        },{
+            onSuccess:()=>{
+                setloading(false)
             },
             onError:({error})=>{
                 seterror(error.message)
@@ -109,18 +127,18 @@ const SignInView = () => {
                             <span className='bg-card text-muted-foreground relative z-10 px-2'>Or continue with</span>
                             </div>
                             <div className='grid grid-cols-2 gap-4'>
-                                <Button variant='outline' type='button' className='w-full' disabled={loading}>
-                                    Google
+                                <Button variant='outline' type='button' className='hover:bg-gray-400 w-full bg-gray-300'disabled={loading} onClick={()=>onSocial('google')}>
+                                    <Image className='' src='/google.svg' height={24} width={24} alt='google logo'/ >
                                     
                                 </Button>
-                                <Button variant='outline' type='button' className='w-full' disabled={loading}>
-                                    Github
+                                <Button variant='outline' type='button' className='hover:bg-gray-700 w-full bg-stone-700' disabled={loading} onClick={()=>onSocial('github')}>
+                                    <GithubIcon height={24} width={24} className='text-white'/>
                                     
                                 </Button>
                             </div>
                             <div className='text-center text-sm'>
                                 Don&apos;t have an account?{" "}
-                                <Link className='underline underline-offset-4' href='/sign-up'>Sign up</Link>
+                                 <Link className='underline underline-offset-4' href='/sign-up'>Sign up</Link>
                             </div>
                         </div>
                     </form>
