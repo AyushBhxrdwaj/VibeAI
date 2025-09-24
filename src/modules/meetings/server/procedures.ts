@@ -10,8 +10,21 @@ import {
   MIN_PAGE_SIZE,
 } from "@/constants";
 import { TRPCError } from "@trpc/server";
+import { meetingsInsertSchema } from "../schema";
 
 export const meetingsRouter = createTRPCRouter({
+   create: protectedProcedure
+      .input(meetingsInsertSchema)
+      .mutation(async ({ input, ctx }) => {
+        const [createdMeeting] = await db
+          .insert(meetings)
+          .values({
+            ...input,
+            userId: ctx.auth.user.id,
+          })
+          .returning();
+        return createdMeeting;
+      }),
 
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))
