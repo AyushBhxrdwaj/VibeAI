@@ -1,14 +1,21 @@
 import ResponsiveDialog from '@/components/responsive-dialog'
+import { useRouter } from 'next/navigation'
 import React from 'react'
+import MeetingForm from './meeting-form';
+
 
 interface props{
     open:boolean,
     onOpenChange:(open:boolean)=>void,
 }
 const NewMeetingDialog = ({open,onOpenChange}:props) => {
+  const router=useRouter();
   return (
     <ResponsiveDialog title='New Meeting' description='Create a new meeting' open={open} onOpenChange={onOpenChange}>
-        To do meeting form
+        <MeetingForm onSuccess={(id)=>{
+          onOpenChange(false)
+          router.push(`/meetings/${id}`)
+        }} onCancel={() => onOpenChange}/>
     </ResponsiveDialog>
   )
 }

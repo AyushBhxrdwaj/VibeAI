@@ -23,8 +23,9 @@ export const agentRouter = createTRPCRouter({
       throw new TRPCError({
         code:"NOT_FOUND",
         message:"Agent not Found"
-      })
+      });
     }
+    return updatedAgent;
   }),
 
   remove:protectedProcedure.input(z.object({id:z.string()})).mutation(async ({ctx,input})=>{
