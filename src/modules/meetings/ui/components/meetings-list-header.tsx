@@ -1,10 +1,28 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, XCircleIcon } from "lucide-react";
 import NewMeetingDialog from "./new-meeting-dialog";
 import { useState } from "react";
+import MeetingsSearchFilter from "./meetings-search-filter";
+import StatusFilter from "./status-filter";
+import AgentsIdFilter from "./agents-id-filter";
+import { useMeetingsFilters } from "../../hooks/use-meetings-filters";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { DEFAULT_PAGE } from "@/constants";
 const MeetingListHeader = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [filters, setfilters] = useMeetingsFilters();
+
+  const isAnyfilterModified =
+    !!filters.status || !!filters.search || !!filters.agentId;
+  const onClearFilters = () => {
+    setfilters({
+      status: null,
+      agentId: "",
+      search: "",
+      page: DEFAULT_PAGE,
+    });
+  };
   return (
     <>
       <NewMeetingDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
@@ -13,12 +31,24 @@ const MeetingListHeader = () => {
           <h5 className="font-medium text-xl">My Meetings</h5>
           <Button onClick={() => setIsDialogOpen(true)}>
             <PlusIcon className="" />
-             New Meeting
+            New Meeting
           </Button>
         </div>
-        <div className="flex items-center gap-x-2 p-1">
-          
-        </div>
+        <ScrollArea>
+          <div className="flex items-center gap-x-2 p-1">
+            <MeetingsSearchFilter />
+
+            <StatusFilter />
+            <AgentsIdFilter />
+            {isAnyfilterModified && (
+              <Button variant={"outline"} onClick={onClearFilters}>
+                <XCircleIcon className="size-4" />
+                Clear
+              </Button>
+            )}
+          </div>
+          <ScrollBar orientation="horizontal"/>
+        </ScrollArea>
       </div>
     </>
   );
