@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { CallView } from "@/modules/call/ui/views/call-view";
 import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { headers } from "next/headers";
@@ -10,7 +11,8 @@ interface props{
     }>
 };
 
-export const Page=async({params}:props)=>{
+const Page=async({params}:props)=>{
+    const {meetingId}=await params;
     const session=await auth.api.getSession({
         headers:await headers()
     });
@@ -18,7 +20,6 @@ export const Page=async({params}:props)=>{
     if(!session){
         redirect('/sign-in')
     }
-    const {meetingId}=await params;
     const queryClient=getQueryClient();
 
     void queryClient.prefetchQuery(
@@ -27,7 +28,10 @@ export const Page=async({params}:props)=>{
 
     return(
         <HydrationBoundary state={dehydrate(queryClient)}>
+            <CallView meetingId={meetingId}/>
 
         </HydrationBoundary>
     )
 }
+
+export default Page;
