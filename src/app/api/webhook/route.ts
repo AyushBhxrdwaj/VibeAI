@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { agents, meetings } from "@/db/schema";
 import { streamVideo } from "@/lib/stream-video";
-import { CallSessionStartedEvent } from "@stream-io/node-sdk";
+import { CallSessionParticipantLeftEvent, CallSessionStartedEvent } from "@stream-io/node-sdk";
 import { and, eq, not } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -67,6 +67,24 @@ export async function POST(req:NextRequest){
         return NextResponse.json({error:"Agent not found"},{status:404});
     }
     const call=streamVideo.video.call('default',meetingId)
+
+    const realtimeClient=await streamVideo.video.connectOpenAi({
+        call,
+        openAiApiKey:process.env.OPEN_AI_API_KEY!,
+        agentUserId:existingAgent.id
+    })
+    realtimeClient.updateSession({
+        instructions:existingAgent.instructions,
+    });
+}else if(eventType==="call.session_particiant_left"){
+    const event=payload as CallSessionParticipantLeftEvent;
+    const meetingId=event.call_cid.split(":")[1];
+
+    if(!meetingId){
+        return NextResponse.json({error:"Missing meetingId in call custom data"},{status:400});
+    }
+    const call=streamVideo.video.call('default',meetingId);
+    await call.end();
 }
     return NextResponse.json({status:"ok"});
 }
