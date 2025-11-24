@@ -40,6 +40,8 @@
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.2",
     "humanize-duration": "^3.1.0",
+    "inngest": "^3.46.0",
+    "jsonl-parse-stringify": "^1.0.3",
     "lucide-react": "^0.542.0",
     "nanoid": "^5.1.5",
     "next": "15.5.2",
