@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { agents, meetings } from "@/db/schema";
+import { inngest } from "@/inngest/client";
 import { streamVideo } from "@/lib/stream-video";
 import {
   CallEndedEvent,
@@ -138,6 +139,14 @@ export async function POST(req: NextRequest) {
     if (!updatedMeeting) {
       return NextResponse.json({ error: "Meeting not found" }, { status: 404 });
     } 
+
+    await inngest.send({
+      name: "meetings/processing",
+      data:{
+        meetingId:updatedMeeting.id,
+        transcriptUrl:updatedMeeting.transcriptUrl
+      }
+    })
   }else if (eventType === "call.recording_ready") {
       const event = payload as CallRecordingReadyEvent;
       const meetingId = event.call_cid.split(":")[1];
