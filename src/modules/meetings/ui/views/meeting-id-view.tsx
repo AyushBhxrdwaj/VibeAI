@@ -72,7 +72,7 @@ const MeetingIdView = ({ meetingId }: props) => {
 
         {isCancelled&&(<CancelledState/>)}
         {isProcessing&&(<ProcessingState/>)} 
-        {isCompleted&&<CompletedState/>}
+        {isCompleted&&<CompletedState data={data}/>}
         {isActive&&(<ActiveState meetingId={meetingId}/>)}
         {isUpcoming&&(<UpcomingState meetingId={meetingId} onCancelMeeting={()=>{}} isCancelling={false}/>)}
       </div>
