@@ -9,13 +9,14 @@ import {
   FileVideoIcon,
   SparkleIcon,
 } from "lucide-react";
-import Markdown from'react-markdown'
+import Markdown from "react-markdown";
 import Link from "next/link";
 import { GeneratedAvatar } from "@/components/generated-avatar";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { formatDuration } from "@/lib/utils";
 import Transcript from "./transcript";
+import { ChatProvider } from "./chat-provider";
 
 interface Props {
   data: MeetingGetOne;
@@ -60,9 +61,11 @@ const CompletedState = ({ data }: Props) => {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </div>
+        <TabsContent value="chat">
+          <ChatProvider meetingId={data.id} meetingName={data.name} />
+        </TabsContent>
         <TabsContent value="transcript">
-          <Transcript meetingId={data.id}/>
-
+          <Transcript meetingId={data.id} />
         </TabsContent>
         <TabsContent value="recording">
           <div className="bg-white rounded-lg border px-4 py-5">
@@ -73,63 +76,80 @@ const CompletedState = ({ data }: Props) => {
             ></video>
           </div>
         </TabsContent>
-        <TabsContent value='summary'>
+        <TabsContent value="summary">
           <div className="bg-white rounded-lg border">
             <div className="px-4 py-5 gap-y-5 fex flex-col col-span-5">
-              <h2 className="text-2xl font-medium capitalize">
-                {data.name}
-              </h2>
+              <h2 className="text-2xl font-medium capitalize">{data.name}</h2>
               <div className="flex gap-x-2 items-center">
-                <Link href={`/agents/${data.agent.id}`}
-                className="flex items-center gap-x-2 underline underline-offset-4 capitalize">
+                <Link
+                  href={`/agents/${data.agent.id}`}
+                  className="flex items-center gap-x-2 underline underline-offset-4 capitalize"
+                >
                   <GeneratedAvatar
-                  variant="botttsNeutral"
-                  seed={data.agent.name}
-                  className="size-5"/>
+                    variant="botttsNeutral"
+                    seed={data.agent.name}
+                    className="size-5"
+                  />
                   {data.agent.name}
                 </Link>
-                <p>{data.startedAt?format(data.startedAt,"PPP"):""}</p>
-                
+                <p>{data.startedAt ? format(data.startedAt, "PPP") : ""}</p>
               </div>
               <div className="flex gap-x-2 items-center">
-                <SparkleIcon className="size-4"/>
+                <SparkleIcon className="size-4" />
                 <p>General Summary</p>
               </div>
-              <Badge variant={'outline'}
-              className="flex items-center gap-x-2 {&>svg}:size-4">
-                <ClockFadingIcon className="text-blue-700"/>
-                {data.duration?formatDuration(data.duration):"No duration"}
-
+              <Badge
+                variant={"outline"}
+                className="flex items-center gap-x-2 {&>svg}:size-4"
+              >
+                <ClockFadingIcon className="text-blue-700" />
+                {data.duration ? formatDuration(data.duration) : "No duration"}
               </Badge>
               <div>
                 <Markdown
-                components={{
-                  h1:(props)=>(
-                    <h1 className="text-2xl font-medium mb-6" {...props}/>
-                  ),
-                  h2:(props)=>(
-                    <h2 className="text-xl font-medium mb-6" {...props}/>
-                  ),
-                  h3:(props)=>(
-                    <h3 className="text-lg font-medium mb-6" {...props}/>
-                  ),
-                  h4:(props)=>(
-                    <h4 className="text-base font-medium mb-6" {...props}/>
-                  ),
-                  p:(props)=>(
-                    <p className="mb-6 leading-relaxed" {...props}/>
-                  ),
-                  ul:(props)=>(
-                    <ul className="list-disc list-inside mb-6" {...props}/>
-                  ),
-                  ol:(props)=>(
-                    <ol className="list-decimal list-inside mb-6" {...props}/>
-                  ),
-                  li:(props)=><li className="mb-1" {...props}/>,
-                  strong:(props)=><strong className="font-semibold" {...props}/>,
-                  code:(props)=><code className="bg-gray-100 px-1 py-0.5 rounded" {...props}/>,
-                  blockquote:(props)=><blockquote className="border-l-4  pl-4 italic my-4" {...props}/>,
-                }}>
+                  components={{
+                    h1: (props) => (
+                      <h1 className="text-2xl font-medium mb-6" {...props} />
+                    ),
+                    h2: (props) => (
+                      <h2 className="text-xl font-medium mb-6" {...props} />
+                    ),
+                    h3: (props) => (
+                      <h3 className="text-lg font-medium mb-6" {...props} />
+                    ),
+                    h4: (props) => (
+                      <h4 className="text-base font-medium mb-6" {...props} />
+                    ),
+                    p: (props) => (
+                      <p className="mb-6 leading-relaxed" {...props} />
+                    ),
+                    ul: (props) => (
+                      <ul className="list-disc list-inside mb-6" {...props} />
+                    ),
+                    ol: (props) => (
+                      <ol
+                        className="list-decimal list-inside mb-6"
+                        {...props}
+                      />
+                    ),
+                    li: (props) => <li className="mb-1" {...props} />,
+                    strong: (props) => (
+                      <strong className="font-semibold" {...props} />
+                    ),
+                    code: (props) => (
+                      <code
+                        className="bg-gray-100 px-1 py-0.5 rounded"
+                        {...props}
+                      />
+                    ),
+                    blockquote: (props) => (
+                      <blockquote
+                        className="border-l-4  pl-4 italic my-4"
+                        {...props}
+                      />
+                    ),
+                  }}
+                >
                   {data.summary}
                 </Markdown>
               </div>
